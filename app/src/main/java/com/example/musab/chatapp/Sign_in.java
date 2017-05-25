@@ -26,6 +26,7 @@ public class Sign_in extends AppCompatActivity {
     CheckBox Show_Pass;
     FirebaseAuth firebaseAuth;
     String name,contact;
+    String str_username,str_password;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,9 +34,57 @@ public class Sign_in extends AppCompatActivity {
 
         firebaseAuth= FirebaseAuth.getInstance();
         Firebase.setAndroidContext(this);
-        if (firebaseAuth.getCurrentUser() != null)
-            Toast.makeText(Sign_in.this,firebaseAuth.getCurrentUser().getEmail().toString(),Toast.LENGTH_LONG).show();
+        if (firebaseAuth.getCurrentUser() != null) {
+            Toast.makeText(Sign_in.this, firebaseAuth.getCurrentUser().getEmail().toString(), Toast.LENGTH_LONG).show();
 
+            final DatabaseReference user_id = FirebaseDatabase.getInstance().getReference().getRoot().child("Users");
+            user_id.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                                    Toast.makeText(Sign_in.this, dataSnapshot.child("Email").getValue().toString(), Toast.LENGTH_SHORT).show();
+                    if (dataSnapshot.child("Email").getValue().toString().equals(firebaseAuth.getCurrentUser().getEmail().toString())) {
+                        name = dataSnapshot.child("Name").getValue().toString();
+                        Toast.makeText(Sign_in.this,name,Toast.LENGTH_LONG).show();
+                        contact = dataSnapshot.child("Contact Info").getValue().toString();
+                    } else
+                    {name = "Default";
+                        contact = "000";}
+
+
+                    Toast.makeText(Sign_in.this, "Logged in", Toast.LENGTH_LONG).show();
+                    Intent signin = new Intent(Sign_in.this, MainActivity.class);
+                    Bundle b = new Bundle();
+                    b.putString("Name", name);
+                    b.putString("Contact Info", contact);
+                    signin.putExtras(b);
+                    finish();
+                    startActivity(signin);
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+
+            });
+
+        }
 
         Sign_in = (Button) findViewById(R.id.signin);
         Show_Pass = (CheckBox) findViewById(R.id.show_pass);
@@ -69,15 +118,16 @@ public class Sign_in extends AppCompatActivity {
                 Intent signin=new Intent(Sign_in.this,MainActivity.class);
 //                startActivity(signin);
                 Toast.makeText(Sign_in.this,"Checking",Toast.LENGTH_LONG).show();
-                userLogin();
+                str_username = Email.getText().toString();
+                str_password = Password.getText().toString();
+                userLogin (str_username,str_password);
             }
         });
     }
 
 
-    private void userLogin() {
-        final String username = Email.getText().toString();
-        String password = Password.getText().toString();
+    private void userLogin(final String username, String password) {
+
 
        final DatabaseReference user_id = FirebaseDatabase.getInstance().getReference().getRoot().child("Users");
 

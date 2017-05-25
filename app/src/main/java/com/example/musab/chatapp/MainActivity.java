@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Rooms");
 
 
+
         //CREATE AN ENTRY FOR NEW ROOM IN FIREBASE DATABASE ON BUTTON CLICK
         createRoom.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +77,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                data.put("Value",dataSnapshot.getValue());
+                Toast.makeText(MainActivity.this,dataSnapshot.getValue().toString(),Toast.LENGTH_SHORT).show();
+
+                data= new HashMap<String, Object>();
+                data.put("Value",dataSnapshot.getValue().toString());
+
                 for (int i = 0; i<data.size();i++) {
                     memberName = (String) data.get(i);
 
