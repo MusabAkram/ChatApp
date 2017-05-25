@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "150218254550",
+    "firebase_url": "https://chatapp-19c89.firebaseio.com",
+    "project_id": "chatapp-19c89",
+    "storage_bucket": "chatapp-19c89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150218254550:android:1f1c82fe53c68415",
+        "android_client_info": {
+          "package_name": "com.example.musab.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150218254550-e6nt06kknsdgklsu9nntlen7j1ngc6rs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqJCrXRendmdsjd76tk7XY_KrH-w7Z8OM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
