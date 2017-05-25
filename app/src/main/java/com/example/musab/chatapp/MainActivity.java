@@ -33,10 +33,13 @@ public class MainActivity extends AppCompatActivity {
     EditText roomName;
     Button createRoom;
     ListView roomList;
+    String memberName;
     ArrayList<String> roomArrayList,members;
     ArrayAdapter<String> roomAdapter;
     DatabaseReference databaseReference;
+    Map<String, Object> data;
     private String Name;
+    Set<String> set;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,23 +74,25 @@ public class MainActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                members= (ArrayList<String>) dataSnapshot.child("2nd").child("Members").getValue();
 
-                Iterator iterator = dataSnapshot.getChildren().iterator();
+                data.put("Value",dataSnapshot.getValue());
+                for (int i = 0; i<data.size();i++) {
+                    memberName = (String) data.get(i);
 
-                Set<String> set = new HashSet<String>();
 
-                while(iterator.hasNext())
-                {
-                    for (int i =0 ;i < members.size(); i++)
-                    {
-                        if(members.get(i).equals(Name)) {
-                            //GET NAMES OF ALL THE ROOMS ONE BY ONE FROM YOUR DATABASE
-                            set.add((String) ((DataSnapshot) iterator.next()).getKey());
+                    Iterator iterator = dataSnapshot.getChildren().iterator();
+
+                    set = new HashSet<String>();
+
+                    while (iterator.hasNext()) {
+
+                            if (memberName.equals(Name)) {
+                                //GET NAMES OF ALL THE ROOMS ONE BY ONE FROM YOUR DATABASE
+                                set.add((String) ((DataSnapshot) iterator.next()).getKey());
+                            }
                         }
-                    }
 
-                }
+                    }
 
                 roomArrayList.clear();
                 roomArrayList.addAll(set);
