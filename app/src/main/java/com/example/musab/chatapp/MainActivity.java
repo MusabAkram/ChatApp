@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                members= (ArrayList<String>) dataSnapshot.child(roomName.toString()).child("Members").getValue();
+                members= (ArrayList<String>) dataSnapshot.child("2nd").child("Members").getValue();
 
                 Iterator iterator = dataSnapshot.getChildren().iterator();
 
