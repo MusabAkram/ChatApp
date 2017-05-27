@@ -57,14 +57,14 @@ public class Chat_room extends AppCompatActivity {
     String userName;
     private String chatUserName;
     private String chatMessage;
-    FirebaseStorage storageRef;
+    FirebaseStorage storageRef,fileRef;
     ArrayList<String> marked=new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        storageRef = FirebaseStorage.getInstance();
+        storageRef = FirebaseStorage.getInstance("gs://poponfa-8a11a.appspot.com/");
         //Find the views by their ID
         sendBtn = (Button) findViewById(R.id.sendMsgBtn);
         receivedMsg = (TextView) findViewById(R.id.receivedMsg);
@@ -249,8 +249,10 @@ public class Chat_room extends AppCompatActivity {
 //            String FilePath = getRealPathFromURI(uri); // should the path be here in this string
 //            System.out.print("Path  = " + FilePath);
 //
-//            Uri file = Uri.fromFile(new File("path/to/images/rivers.jpg"));
-//            StorageReference riversRef = storageRef.child("images/"+file.getLastPathSegment());
+//           // Uri file = Uri.fromFile(new File("path/to/images/rivers.jpg"));
+//
+//
+//            fileRef= storageRef.child("images/"+FilePath);
 //            uploadTask = riversRef.putFile(file);
 //
 //// Register observers to listen for when the download is done or if it fails
