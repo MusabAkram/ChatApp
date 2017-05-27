@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -251,10 +252,10 @@ public class Chat_room extends AppCompatActivity {
         if(requestCode == 0)
         {
             Uri uri = data.getData();
-            String FilePath = getRealPathFromURI(uri); // should the path be here in this string
-           Toast.makeText(Chat_room.this,"Path  = " + uri,Toast.LENGTH_LONG).show();
+            String FilePath = getFileName(uri); // should the path be here in this string
+           Toast.makeText(Chat_room.this,"Path  = " + FilePath,Toast.LENGTH_LONG).show();
 
-            upload(uri.toString(), uri);
+            upload(FilePath, uri);
 
         }
     }
@@ -285,13 +286,27 @@ public class Chat_room extends AppCompatActivity {
             }
         });
     }
-    public String getRealPathFromURI(Uri contentUri) {
-        String [] proj      = {MediaStore.Images.Media.DATA};
-        Cursor cursor       = getContentResolver().query( contentUri, proj, null, null,null);
-        if (cursor == null) return null;
-        int column_index    = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 
 }
