@@ -57,14 +57,14 @@ public class Chat_room extends AppCompatActivity {
     String userName;
     private String chatUserName;
     private String chatMessage;
-    FirebaseStorage storageRef,fileRef;
+
     ArrayList<String> marked=new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        storageRef = FirebaseStorage.getInstance("gs://poponfa-8a11a.appspot.com/");
+
         //Find the views by their ID
         sendBtn = (Button) findViewById(R.id.sendMsgBtn);
         receivedMsg = (TextView) findViewById(R.id.receivedMsg);
@@ -74,12 +74,17 @@ public class Chat_room extends AppCompatActivity {
         btn_attach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //intent.setType("*/*");      //all files
+                intent.setType("text/xml");   //XML file only
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
-                startActivityForResult(intent,0);
 
-
+                try {
+                    startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), 0);
+                } catch (android.content.ActivityNotFoundException ex) {
+                    // Potentially direct the user to the Market with a Dialog
+                    Toast.makeText(Chat_room.this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -240,44 +245,53 @@ public class Chat_room extends AppCompatActivity {
 
     }
 
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (resultCode != RESULT_OK) return;
-//        String path     = "";
-//        if(requestCode == 0)
-//        {
-//            Uri uri = data.getData();
-//            String FilePath = getRealPathFromURI(uri); // should the path be here in this string
-//            System.out.print("Path  = " + FilePath);
-//
-//           // Uri file = Uri.fromFile(new File("path/to/images/rivers.jpg"));
-//
-//
-//            fileRef= storageRef.child("images/"+FilePath);
-//            uploadTask = riversRef.putFile(file);
-//
-//// Register observers to listen for when the download is done or if it fails
-//            uploadTask.addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception exception) {
-//                    // Handle unsuccessful uploads
-//                }
-//            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-//                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-//                }
-//            });
-//        }
-//    }
-//
-//    public String getRealPathFromURI(Uri contentUri) {
-//        String [] proj      = {MediaStore.Images.Media.DATA};
-//        Cursor cursor       = getContentResolver().query( contentUri, proj, null, null,null);
-//        if (cursor == null) return null;
-//        int column_index    = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//        cursor.moveToFirst();
-//        return cursor.getString(column_index);
-//    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) return;
+        String path     = "";
+        if(requestCode == 0)
+        {
+            Uri uri = data.getData();
+            String FilePath = getRealPathFromURI(uri); // should the path be here in this string
+           Toast.makeText(Chat_room.this,"Path  = " + uri,Toast.LENGTH_LONG).show();
+
+            upload(uri.toString(), uri);
+
+        }
+    }
+
+    public void upload(String filepath, Uri file)
+    {
+
+        //Uploading  :-----------------
+
+        StorageReference storageRef = FirebaseStorage.getInstance("gs://poponfa-8a11a.appspot.com/").getReference();
+
+        StorageReference riversRef = storageRef.child("images/"+ filepath);
+
+        UploadTask uploadTask = riversRef.putFile(file);
+
+// Register observers to listen for when the download is done or if it fails
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Toast.makeText(Chat_room.this,"Uploaded",Toast.LENGTH_SHORT).show();
+                //Uri downloadUrl = taskSnapshot.getDownloadUrl();
+            }
+        });
+    }
+    public String getRealPathFromURI(Uri contentUri) {
+        String [] proj      = {MediaStore.Images.Media.DATA};
+        Cursor cursor       = getContentResolver().query( contentUri, proj, null, null,null);
+        if (cursor == null) return null;
+        int column_index    = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
 
 }
