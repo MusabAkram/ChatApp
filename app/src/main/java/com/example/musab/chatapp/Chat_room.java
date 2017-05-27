@@ -2,6 +2,11 @@ package com.example.musab.chatapp;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,13 +24,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +44,7 @@ import java.util.Map;
 public class Chat_room extends AppCompatActivity {
 
     //Fields for out Views
-    Button sendBtn;
+    Button sendBtn, btn_attach;
     TextView receivedMsg;
     EditText sendMsg;
     String sendUserName;
@@ -46,16 +57,32 @@ public class Chat_room extends AppCompatActivity {
     String userName;
     private String chatUserName;
     private String chatMessage;
+    FirebaseStorage storageRef;
     ArrayList<String> marked=new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        storageRef = FirebaseStorage.getInstance();
         //Find the views by their ID
         sendBtn = (Button) findViewById(R.id.sendMsgBtn);
         receivedMsg = (TextView) findViewById(R.id.receivedMsg);
         sendMsg = (EditText) findViewById(R.id.sendMsgEdit);
+        btn_attach= (Button) findViewById(R.id.btn_attach);
+
+        btn_attach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent,0);
+
+
+            }
+        });
+
 
         //Get intent extras
         roomName = getIntent().getExtras().get("Room_name").toString();
@@ -212,5 +239,43 @@ public class Chat_room extends AppCompatActivity {
         receivedMsg.append(chatUserName + ":" + chatMessage + "\n");
 
     }
+
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (resultCode != RESULT_OK) return;
+//        String path     = "";
+//        if(requestCode == 0)
+//        {
+//            Uri uri = data.getData();
+//            String FilePath = getRealPathFromURI(uri); // should the path be here in this string
+//            System.out.print("Path  = " + FilePath);
+//
+//            Uri file = Uri.fromFile(new File("path/to/images/rivers.jpg"));
+//            StorageReference riversRef = storageRef.child("images/"+file.getLastPathSegment());
+//            uploadTask = riversRef.putFile(file);
+//
+//// Register observers to listen for when the download is done or if it fails
+//            uploadTask.addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception exception) {
+//                    // Handle unsuccessful uploads
+//                }
+//            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+//                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+//                }
+//            });
+//        }
+//    }
+//
+//    public String getRealPathFromURI(Uri contentUri) {
+//        String [] proj      = {MediaStore.Images.Media.DATA};
+//        Cursor cursor       = getContentResolver().query( contentUri, proj, null, null,null);
+//        if (cursor == null) return null;
+//        int column_index    = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//        cursor.moveToFirst();
+//        return cursor.getString(column_index);
+//    }
 
 }
