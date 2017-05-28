@@ -12,8 +12,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.MenuPopupWindow;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -232,15 +235,7 @@ public class Chat_room extends AppCompatActivity {
         }
     }
 
-    //Load messages
-    private void update_Message(DataSnapshot dataSnapshot) {
 
-        chatUserName = (String) dataSnapshot.child("name").getValue();
-        chatMessage = (String) dataSnapshot.child("message").getValue();
-
-        receivedMsg.append(chatUserName + ":" + chatMessage + "\n");
-
-    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) return;
@@ -256,36 +251,38 @@ public class Chat_room extends AppCompatActivity {
         }
     }
 
-    public void upload(String filepath, Uri file)
+    public void upload(final String filepath, Uri file)
     {
 
         //Uploading  :-----------------
 
         final StorageReference storageRef = FirebaseStorage.getInstance("gs://chatapp-19c89.appspot.com/").getReference();
 
-        StorageReference riversRef = storageRef.child("images/"+ filepath);
+        final StorageReference riversRef = storageRef.child("images/"+ filepath);
 
-        UploadTask uploadTask = riversRef.putFile(file);
+        final UploadTask uploadTask = riversRef.putFile(file);
 
 // Register observers to listen for when the download is done or if it fails
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @SuppressWarnings("VisibleForTests")
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Toast.makeText(Chat_room.this,"Uploaded",Toast.LENGTH_SHORT).show();
-                String link= String.valueOf(storageRef.child("users/me/profile.png").getDownloadUrl());
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                Log.d("MainActivity", downloadUrl.toString());
+                String link= String.valueOf(downloadUrl);
                 Toast.makeText(Chat_room.this,link,Toast.LENGTH_SHORT).show();
-                receivedMsg.setText(link);
-                receivedMsg.setMovementMethod(LinkMovementMethod.getInstance());
-                
-            }
-        });
+                receivedMsg.setText(Html.fromHtml(link));
+                Linkify.addLinks(receivedMsg, Linkify.ALL);
+
+                }
+
+
+
+            });
+
+
     }
+
 
     public String getFileName(Uri uri) {
         String result = null;
@@ -308,5 +305,13 @@ public class Chat_room extends AppCompatActivity {
         }
         return result;
     }
+    //Load messages
+    private void update_Message(DataSnapshot dataSnapshot) {
 
+        chatUserName = (String) dataSnapshot.child("name").getValue();
+        chatMessage = (String) dataSnapshot.child("message").getValue();
+
+        receivedMsg.append(chatUserName + ":" + chatMessage + "\n");
+
+    }
 }
