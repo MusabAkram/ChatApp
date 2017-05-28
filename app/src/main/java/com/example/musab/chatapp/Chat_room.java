@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.MenuPopupWindow;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -280,6 +281,7 @@ public class Chat_room extends AppCompatActivity {
                 String link= String.valueOf(storageRef.child("users/me/profile.png").getDownloadUrl());
                 Toast.makeText(Chat_room.this,link,Toast.LENGTH_SHORT).show();
                 receivedMsg.setText(link);
+                receivedMsg.setMovementMethod(LinkMovementMethod.getInstance());
                 
             }
         });
