@@ -7,7 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -18,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.client.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -94,36 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         databaseReference.addChildEventListener(new ChildEventListener() {
-
-
-
-                //Log.i("Members",data.toString());
-                //Toast.makeText(MainActivity.this,dataSnapshot.child("Members").child("0").getValue().toString(),Toast.LENGTH_SHORT).show();
-
-
-
-//                for (int i = 0; i<data.size();i++) {
-//                    memberName = (String) data.get(i);
-//
-//
-//                    Iterator iterator = dataSnapshot.getChildren().iterator();
-//
-//                    set = new HashSet<String>();
-//
-//                    while (iterator.hasNext()) {
-//
-//                            if (memberName.equals(Name)) {
-//                                //GET NAMES OF ALL THE ROOMS ONE BY ONE FROM YOUR DATABASE
-//                                set.add((String) ((DataSnapshot) iterator.next()).getKey());
-//                            }
-//                        }
-//
-//                    }
-
-//                roomArrayList.clear();
-//                roomArrayList.addAll(set);
-//
-//                roomAdapter.notifyDataSetChanged();
 
 
             @Override

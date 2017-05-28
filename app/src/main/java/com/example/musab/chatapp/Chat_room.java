@@ -58,14 +58,14 @@ public class Chat_room extends AppCompatActivity {
     String userName;
     private String chatUserName;
     private String chatMessage;
-
+    FirebaseStorage storageRef,fileRef;
     ArrayList<String> marked=new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-
+        storageRef = FirebaseStorage.getInstance("gs://poponfa-8a11a.appspot.com/");
         //Find the views by their ID
         sendBtn = (Button) findViewById(R.id.sendMsgBtn);
         receivedMsg = (TextView) findViewById(R.id.receivedMsg);
@@ -75,17 +75,12 @@ public class Chat_room extends AppCompatActivity {
         btn_attach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //intent.setType("*/*");      //all files
-                intent.setType("text/xml");   //XML file only
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent,0);
 
-                try {
-                    startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), 0);
-                } catch (android.content.ActivityNotFoundException ex) {
-                    // Potentially direct the user to the Market with a Dialog
-                    Toast.makeText(Chat_room.this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
-                }
+
             }
         });
 
@@ -265,7 +260,7 @@ public class Chat_room extends AppCompatActivity {
 
         //Uploading  :-----------------
 
-        StorageReference storageRef = FirebaseStorage.getInstance("gs://poponfa-8a11a.appspot.com/").getReference();
+        final StorageReference storageRef = FirebaseStorage.getInstance("gs://chatapp-19c89.appspot.com/").getReference();
 
         StorageReference riversRef = storageRef.child("images/"+ filepath);
 
@@ -282,7 +277,10 @@ public class Chat_room extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 Toast.makeText(Chat_room.this,"Uploaded",Toast.LENGTH_SHORT).show();
-                //Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                String link= String.valueOf(storageRef.child("users/me/profile.png").getDownloadUrl());
+                Toast.makeText(Chat_room.this,link,Toast.LENGTH_SHORT).show();
+                receivedMsg.setText(link);
+                
             }
         });
     }
